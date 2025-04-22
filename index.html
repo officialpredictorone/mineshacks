@@ -7,8 +7,8 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #000000, #1c1c1c);
-      color: #fff;
+      background: linear-gradient(to bottom, #1a1a2e, #16213e);
+      color: #f1f1f1;
       margin: 0;
       padding: 0;
       display: flex;
@@ -19,20 +19,20 @@
     }
     .container {
       text-align: center;
-      background: #121212;
+      background: #0f3460;
       padding: 40px;
       border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
       max-width: 500px;
     }
     h1 {
       font-size: 2.2rem;
       margin-bottom: 1rem;
-      color: #00ff88;
+      color: #00d9ff;
     }
     p {
       font-size: 1rem;
-      color: #aaa;
+      color: #c4d7e0;
     }
     .input-section {
       margin-bottom: 2rem;
@@ -44,25 +44,34 @@
       border: none;
       width: 80%;
       text-align: center;
-      background: #1e1e1e;
+      background: #1e1e2f;
       color: #fff;
       margin-top: 10px;
     }
-    .submit-id-btn, .predict-btn, .create-account-btn, .mine-option {
-      background: #00ff88;
+    select {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background: #1e1e2f;
+      color: #fff;
+      margin-top: 10px;
+    }
+    .submit-id-btn, .predict-btn, .create-account-btn {
+      background: #00d9ff;
       border: none;
       padding: 0.8rem 2rem;
       font-size: 1rem;
       border-radius: 10px;
-      color: white;
+      color: #000;
       cursor: pointer;
       margin-top: 1.2rem;
       transition: background 0.3s;
       text-decoration: none;
       display: inline-block;
     }
-    .submit-id-btn:hover, .predict-btn:hover, .create-account-btn:hover, .mine-option:hover {
-      background: #00cc6a;
+    .submit-id-btn:hover, .predict-btn:hover, .create-account-btn:hover {
+      background: #00aacc;
     }
     .grid {
       display: grid;
@@ -74,31 +83,29 @@
     .tile {
       width: 50px;
       height: 50px;
-      background: #1e1e1e;
-      border: 2px solid #00ff88;
+      background: #000;
+      border: 2px solid #1e1e1e;
       border-radius: 8px;
     }
     .highlight {
-      background-color: #00ff88;
-    }
-    .mine-select {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-    .active-option {
-      box-shadow: 0 0 10px #00ff88;
-      font-weight: bold;
+      background-color: #00ff88 !important;
+      border: 2px solid #00ff88;
     }
     .hidden {
       display: none;
     }
     .error-message {
-      color: #ff5555;
+      color: #ff7373;
       font-size: 1.1rem;
       margin-top: 1rem;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .predict-wrapper {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -114,28 +121,23 @@
     </div>
 
     <div id="predictSection" class="hidden">
-      <h1>Safe Tiles Predictor</h1>
-      <p>Select number of mines</p>
-      <div class="mine-select">
-        <button class="mine-option active-option" onclick="setMineCount(3)">3 Mines</button>
-        <button class="mine-option" onclick="setMineCount(5)">5 Mines</button>
-        <button class="mine-option" onclick="setMineCount(10)">10 Mines</button>
+      <h1>Where to Click</h1>
+      <label for="mineCount">Select number of mines:</label>
+      <select id="mineCount">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5" selected>5</option>
+      </select>
+      <div class="predict-wrapper">
+        <button class="predict-btn" onclick="predictTiles()">Predict Now</button>
       </div>
-      <button class="predict-btn" onclick="predictTiles()">Predict Now</button>
       <div class="grid" id="tilesResult"></div>
     </div>
   </div>
 
   <script>
-    let selectedMineCount = 3;
-
-    function setMineCount(count) {
-      selectedMineCount = count;
-      const buttons = document.querySelectorAll('.mine-option');
-      buttons.forEach(btn => btn.classList.remove('active-option'));
-      event.target.classList.add('active-option');
-    }
-
     function submitId() {
       const userId = document.getElementById('userId').value.trim();
       const isNumeric = /^\d{1,10}$/.test(userId);
@@ -146,7 +148,7 @@
       }
 
       if (!userId.startsWith("123")) {
-        document.getElementById("errorMessage").innerText = "You need to create new account and top up 200-300 KES. Use KN611 promo code to take bonuses from me";
+        document.getElementById("errorMessage").innerText = "You need to create new account and top up 200-300 KES";
         document.getElementById("submitBtn").classList.add("hidden");
         document.getElementById("createAccountBtn").classList.remove("hidden");
         return;
@@ -157,22 +159,21 @@
     }
 
     function predictTiles() {
-      const safeTileCount = 25 - selectedMineCount;
       const tilesContainer = document.getElementById('tilesResult');
       tilesContainer.innerHTML = '';
-      const safeTiles = new Set();
+      const highlightTiles = new Set();
 
-      while (safeTiles.size < safeTileCount) {
+      while (highlightTiles.size < 5) {
         const row = Math.floor(Math.random() * 5) + 1;
         const col = Math.floor(Math.random() * 5) + 1;
-        safeTiles.add(`${row},${col}`);
+        highlightTiles.add(`${row},${col}`);
       }
 
       for (let row = 1; row <= 5; row++) {
         for (let col = 1; col <= 5; col++) {
           const tile = document.createElement('div');
           tile.className = 'tile';
-          if (safeTiles.has(`${row},${col}`)) {
+          if (highlightTiles.has(`${row},${col}`)) {
             tile.classList.add('highlight');
           }
           tilesContainer.appendChild(tile);
