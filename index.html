@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mines Predictor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #000000, #1c1c1c);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      background: #121212;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+      max-width: 500px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: #00ff88;
+    }
+    p {
+      font-size: 1rem;
+      color: #aaa;
+    }
+    .input-section {
+      margin-bottom: 2rem;
+    }
+    input[type="text"] {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      width: 80%;
+      text-align: center;
+      background: #1e1e1e;
+      color: #fff;
+      margin-top: 10px;
+    }
+    .submit-id-btn, .predict-btn, .create-account-btn, .mine-option {
+      background: #00ff88;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      margin-top: 1.2rem;
+      transition: background 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .submit-id-btn:hover, .predict-btn:hover, .create-account-btn:hover, .mine-option:hover {
+      background: #00cc6a;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .tile {
+      width: 50px;
+      height: 50px;
+      background: #1e1e1e;
+      border: 2px solid #00ff88;
+      border-radius: 8px;
+    }
+    .highlight {
+      background-color: #00ff88;
+    }
+    .mine-select {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .active-option {
+      box-shadow: 0 0 10px #00ff88;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .error-message {
+      color: #ff5555;
+      font-size: 1.1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="input-section" id="idSection">
+      <h1>Mines Predictor</h1>
+      <input type="text" id="userId" placeholder="Enter your ID" maxlength="10" oninput="this.value=this.value.replace(/[^\d]/g,'')" />
+      <br />
+      <button class="submit-id-btn" id="submitBtn" onclick="submitId()">Submit</button>
+      <div class="error-message" id="errorMessage"></div>
+      <a href="https://youraffiliatelink.com" class="create-account-btn hidden" id="createAccountBtn">Create new account</a>
+    </div>
+
+    <div id="predictSection" class="hidden">
+      <h1>Safe Tiles Predictor</h1>
+      <p>Select number of mines</p>
+      <div class="mine-select">
+        <button class="mine-option active-option" onclick="setMineCount(3)">3 Mines</button>
+        <button class="mine-option" onclick="setMineCount(5)">5 Mines</button>
+        <button class="mine-option" onclick="setMineCount(10)">10 Mines</button>
+      </div>
+      <button class="predict-btn" onclick="predictTiles()">Predict Now</button>
+      <div class="grid" id="tilesResult"></div>
+    </div>
+  </div>
+
+  <script>
+    let selectedMineCount = 3;
+
+    function setMineCount(count) {
+      selectedMineCount = count;
+      const buttons = document.querySelectorAll('.mine-option');
+      buttons.forEach(btn => btn.classList.remove('active-option'));
+      event.target.classList.add('active-option');
+    }
+
+    function submitId() {
+      const userId = document.getElementById('userId').value.trim();
+      const isNumeric = /^\d{1,10}$/.test(userId);
+
+      if (!isNumeric) {
+        alert('Please enter a valid numeric ID (up to 10 digits)');
+        return;
+      }
+
+      if (!userId.startsWith("123")) {
+        document.getElementById("errorMessage").innerText = "You need to create new account and top up 200-300 KES. Use KN611 promo code to take bonuses from me";
+        document.getElementById("submitBtn").classList.add("hidden");
+        document.getElementById("createAccountBtn").classList.remove("hidden");
+        return;
+      }
+
+      document.getElementById('idSection').classList.add('hidden');
+      document.getElementById('predictSection').classList.remove('hidden');
+    }
+
+    function predictTiles() {
+      const safeTileCount = 25 - selectedMineCount;
+      const tilesContainer = document.getElementById('tilesResult');
+      tilesContainer.innerHTML = '';
+      const safeTiles = new Set();
+
+      while (safeTiles.size < safeTileCount) {
+        const row = Math.floor(Math.random() * 5) + 1;
+        const col = Math.floor(Math.random() * 5) + 1;
+        safeTiles.add(`${row},${col}`);
+      }
+
+      for (let row = 1; row <= 5; row++) {
+        for (let col = 1; col <= 5; col++) {
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          if (safeTiles.has(`${row},${col}`)) {
+            tile.classList.add('highlight');
+          }
+          tilesContainer.appendChild(tile);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
